@@ -65,11 +65,13 @@ for epoch in range(n_epoch):
         length = len(sentences[0])
         xs = []
         ys = []
-        for i in range(length):
-            x_data = xp.array([s[i][0] for s in sentences], numpy.int32)
-            y_data = xp.array([s[i][1] for s in sentences], numpy.int32)
-            xs.append(chainer.Variable(x_data))
-            ys.append(chainer.Variable(y_data))
+        for s in sentences:
+            xs.append(xp.array([word for word, _ in s], 'i'))
+            ys.append(xp.array([pos for _, pos in s], 'i'))
+
+        xs = F.transpose_sequence(xs)
+        ys = F.transpose_sequence(ys)
+
         loss = model(xs, ys)
         accum_loss += loss.data
         model.zerograds()
