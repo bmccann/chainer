@@ -6,3 +6,4 @@ from chainer.training import util
 IntervalTrigger = interval.IntervalTrigger
 get_trigger = util.get_trigger
 _never_fire_trigger = util._never_fire_trigger
+
