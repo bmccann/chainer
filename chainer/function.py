@@ -188,18 +188,16 @@ class Function(object):
         if self.type_check_enable:
             self._check_data_type_forward(in_data)
 
-        hooks = chainer.get_function_hooks()
-        if self._n_local_function_hooks != 0:
-            hooks = collections.OrderedDict(hooks)
-            hooks.update(self.local_function_hooks)
-        for hook in six.itervalues(hooks):
-            hook.forward_preprocess(self, in_data)
+        # hooks = collections.OrderedDict(chainer.get_function_hooks())
+        # hooks.update(self.local_function_hooks)
+        # for hook in six.itervalues(hooks):
+        #     hook.forward_preprocess(self, in_data)
         # Forward prop
         with cuda.get_device(*in_data):
             outputs = self.forward(in_data)
             assert type(outputs) == tuple
-        for hook in six.itervalues(hooks):
-            hook.forward_postprocess(self, in_data)
+        # for hook in six.itervalues(hooks):
+        #     hook.forward_postprocess(self, in_data)
 
         if chainer.is_debug():
             if any(out.dtype.kind == 'f' and
@@ -209,7 +207,7 @@ class Function(object):
                 raise RuntimeError(msg)
 
         out_v = flag.aggregate_flags([x.volatile for x in inputs])
-        ret = tuple([variable.Variable(y, volatile=out_v) for y in outputs])
+        ret = tuple(variable.Variable(y, volatile=out_v) for y in outputs)
 
         if out_v == 'on':
             build_graph = False

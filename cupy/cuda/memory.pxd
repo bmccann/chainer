@@ -45,8 +45,8 @@ cdef class SingleDeviceMemoryPool:
 
     cdef:
         object _alloc
-        dict _in_use
-        object _free
+        readonly dict _in_use
+        readonly object _free
         object __weakref__
         object _weakref
         Py_ssize_t _allocation_unit_size
@@ -61,7 +61,7 @@ cdef class SingleDeviceMemoryPool:
 cdef class MemoryPool:
 
     cdef:
-        object _pools
+        readonly object _pools
 
     cpdef MemoryPointer malloc(self, Py_ssize_t size)
     cpdef free_all_blocks(self)
