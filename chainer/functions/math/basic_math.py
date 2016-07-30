@@ -118,8 +118,8 @@ class Add(function.Function):
         )
 
     def forward(self, x):
-        #y = utils.force_array(x[0] + x[1])
-        y = x[0] + x[1]
+        y = utils.force_array(x[0] + x[1])
+        #y = x[0] + x[1]
         return y,
 
     def backward(self, x, gy):
