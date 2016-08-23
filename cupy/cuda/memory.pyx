@@ -375,6 +375,7 @@ cdef class SingleDeviceMemoryPool:
         free.append(mem)
 
     cpdef free_all_blocks(self):
+        gc.collect()
         self._free = collections.defaultdict(list)
 
     cpdef free_all_free(self):
@@ -442,7 +443,6 @@ cdef class MemoryPool(object):
 
     cpdef free_all_blocks(self):
         """Release free blocks."""
-        gc.collect()
         dev = device.get_device_id()
         self._pools[dev].free_all_blocks()
 
