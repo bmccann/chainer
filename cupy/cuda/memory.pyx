@@ -320,9 +320,10 @@ cdef class PooledMemory(Memory):
         buffer to the memory pool for reuse.
 
         """
-        pool = self.pool()
-        if pool and self.ptr != 0:
-            pool.free(self.ptr, self.size)
+        if self.pool:
+            pool = self.pool()
+            if pool and self.ptr != 0:
+                pool.free(self.ptr, self.size)
         self.ptr = 0
         self.size = 0
         self.device = None
