@@ -4,6 +4,7 @@ import collections
 import ctypes
 import warnings
 import weakref
+import gc
 
 import six
 
@@ -441,6 +442,7 @@ cdef class MemoryPool(object):
 
     cpdef free_all_blocks(self):
         """Release free blocks."""
+        gc.collect()
         dev = device.get_device_id()
         self._pools[dev].free_all_blocks()
 

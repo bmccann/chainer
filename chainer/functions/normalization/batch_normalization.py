@@ -104,7 +104,7 @@ class BatchNormalizationFunction(function.Function):
         # into a 2-dim array with channels as second dim and m=<product
         # of all dimensions except the 2nd dimension> as the first
         # dimension.
-        self.cudnn_dim_ok = x.ndim == 2 or x.ndim == 4
+        self.cudnn_dim_ok = x.ndim == 4 #x.ndim == 2 or x.ndim == 4
 
         cudnn_updated_running_stats = False
         if xp is not numpy and cuda.cudnn_enabled and self.use_cudnn and \
