@@ -11,6 +11,7 @@ import six
 from cupy.cuda import device
 from cupy.cuda import function
 
+from code import interact
 
 _nvcc_version = None
 
@@ -38,7 +39,6 @@ class TemporaryDirectory(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_value is not None:
             return
-
         for name in os.listdir(self.path):
             os.unlink(os.path.join(self.path, name))
         os.rmdir(self.path)
@@ -77,6 +77,9 @@ def nvcc(source, options=(), arch=None):
         cmd.append(cu_path)
         _run_nvcc(cmd, root_dir)
 
+        # print('ran {cmd} on {path}'.format(cmd=cmd, path=cu_path))
+        # interact(local=locals())
+
         with open(cubin_path, 'rb') as bin_file:
             return bin_file.read()
 
@@ -92,6 +95,9 @@ def preprocess(source, options=()):
 
         cmd.append(cu_path)
         pp_src = _run_nvcc(cmd, root_dir)
+
+        # print('ran {cmd} on {path}'.format(cmd=cmd, path=cu_path))
+        # interact(local=locals())
 
         if isinstance(pp_src, six.binary_type):
             pp_src = pp_src.decode('utf-8')

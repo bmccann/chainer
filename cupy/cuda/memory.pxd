@@ -36,7 +36,7 @@ cpdef set_allocator(allocator=*)
 cdef class PooledMemory(Memory):
 
     cdef:
-        object pool
+        readonly object pool
 
     cpdef free(self)
 
@@ -44,11 +44,11 @@ cdef class PooledMemory(Memory):
 cdef class SingleDeviceMemoryPool:
 
     cdef:
-        object _alloc
+        readonly object _alloc
         readonly dict _in_use
         readonly object _free
         object __weakref__
-        object _weakref
+        readonly object _weakref
         Py_ssize_t _allocation_unit_size
 
     cpdef MemoryPointer malloc(self, Py_ssize_t size)

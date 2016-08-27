@@ -62,6 +62,8 @@ class Convolution2DFunction(function.Function):
             )
 
     def forward_cpu(self, inputs):
+        if self.true_convolution:
+            raise NotImplementedError
         x, W = inputs[:2]
         b = inputs[2] if len(inputs) == 3 else None
         kh, kw = W.shape[2:]
@@ -100,7 +102,9 @@ class Convolution2DFunction(function.Function):
             x_desc = cudnn.create_tensor_descriptor(x)
             y_desc = cudnn.create_tensor_descriptor(y)
 
-            self.filter_desc = cudnn.create_filter_descriptor(W)
+            self.filter_desc = cudnn.create_filter_descriptor(
+                W, mode=libcudnn.CUDNN_CONVOLUTION if self.true_convolution
+                else libcudnn.CUDNN_CROSS_CORRELATION)
             self.conv_desc = cudnn.create_convolution_descriptor(
                 (self.ph, self.pw), (self.sy, self.sx), x.dtype)
             if b is not None:
@@ -129,6 +133,8 @@ class Convolution2DFunction(function.Function):
                     handle, one.data, self.bias_desc.value, b.data.ptr,
                     one.data, y_desc.value, y.data.ptr)
         else:
+            if self.true_convolution:
+                raise NotImplementedError
             # Implementation using im2col
             self.col = conv.im2col_gpu(
                 x, kh, kw, self.sy, self.sx, self.ph, self.pw,
@@ -299,6 +305,8 @@ def convolution_2d(x, W, b=None, stride=1, pad=0, use_cudnn=True,
             If this option is ``True``, then it forces cuDNN to use
             a deterministic algorithm. This option is only available for
             cuDNN version >= v4.
+        true_convolution (bool): If True, use a true convolution (spatially
+            invert the filter) rather than a cross-correlation.
 
 
     Returns:
