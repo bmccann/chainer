@@ -35,7 +35,7 @@ def column_stack(tup):
     return concatenate(lst, axis=1)
 
 
-def concatenate(tup, axis=0):
+def concatenate(tup, axis=0, equal=True):
     """Joins arrays along an axis.
 
     Args:
@@ -51,31 +51,39 @@ def concatenate(tup, axis=0):
     """
     ndim = None
     shape = None
-    for a in tup:
-        if not isinstance(a, cupy.ndarray):
-            raise TypeError('Only cupy arrays can be concatenated')
-        if a.ndim == 0:
-            raise TypeError('zero-dimensional arrays cannot be concatenated')
+    if equal:
+        ndim = tup[0].ndim
+        shape = list(tup[0].shape)
+        axis = _get_positive_axis(ndim, axis)
+        shape[axis] = shape[axis] * len(tup)
+        dtype = tup[0].dtype
+    else:
+        for a in tup:
+            if not isinstance(a, cupy.ndarray):
+                raise TypeError('Only cupy arrays can be concatenated')
+            if a.ndim == 0:
+                raise TypeError('zero-dimensional arrays cannot be concatenated')
+            if ndim is None:
+                ndim = a.ndim
+                shape = list(a.shape)
+                axis = _get_positive_axis(a.ndim, axis)
+                continue
+
+            if a.ndim != ndim:
+                raise ValueError(
+                    'All arrays to concatenate must have the same ndim')
+            if any(i != axis and shape[i] != a.shape[i]
+                   for i in six.moves.range(ndim)):
+                raise ValueError(
+                    'All arrays must have same shape except the axis to '
+                    'concatenate')
+            shape[axis] += a.shape[axis]
+
         if ndim is None:
-            ndim = a.ndim
-            shape = list(a.shape)
-            axis = _get_positive_axis(a.ndim, axis)
-            continue
+            raise ValueError('Cannot concatenate from empty tuple')
 
-        if a.ndim != ndim:
-            raise ValueError(
-                'All arrays to concatenate must have the same ndim')
-        if any(i != axis and shape[i] != a.shape[i]
-               for i in six.moves.range(ndim)):
-            raise ValueError(
-                'All arrays must have same shape except the axis to '
-                'concatenate')
-        shape[axis] += a.shape[axis]
+        dtype = numpy.find_common_type([a.dtype for a in tup], [])
 
-    if ndim is None:
-        raise ValueError('Cannot concatenate from empty tuple')
-
-    dtype = numpy.find_common_type([a.dtype for a in tup], [])
     return core.concatenate(tup, axis, shape, dtype)
 
 
