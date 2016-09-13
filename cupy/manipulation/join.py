@@ -35,7 +35,7 @@ def column_stack(tup):
     return concatenate(lst, axis=1)
 
 
-def concatenate(tup, axis=0, equal=True):
+def concatenate(tup, axis=0, equal=False):
     """Joins arrays along an axis.
 
     Args:
@@ -158,7 +158,7 @@ def stack(tup, axis=0):
 
     .. seealso:: :func:`numpy.stack`
     """
-    return concatenate([cupy.expand_dims(x, axis) for x in tup], axis)
+    return concatenate([cupy.expand_dims(x, axis) for x in tup], axis, equal=True)
 
 
 def _get_positive_axis(ndim, axis):

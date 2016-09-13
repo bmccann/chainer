@@ -14,11 +14,12 @@ class Concat(function.Function):
     """Concatenate multiple tensors towards specified axis."""
 
     # concat along the channel dimension by default
-    def __init__(self, axis=1):
+    def __init__(self, axis=1, equal=False):
         if not isinstance(axis, int):
             raise TypeError('axis must be int')
 
         self.axis = axis
+        self.equal = equal
 
     def check_type_forward(self, in_types):
         type_check.expect(in_types.size() > 0)
@@ -43,8 +44,9 @@ class Concat(function.Function):
 
     def forward(self, xs):
         #xp = cuda.get_array_module(*xs)
-        xp = cupy if isinstance(xs[0],cupy.ndarray) else numpy
-        return xp.concatenate(xs, axis=self.axis),
+        if isinstance(xs[0],cupy.ndarray):
+            return cupy.concatenate(xs, axis=self.axis, equal=self.equal),
+        return numpy.concatenate(xs, axis=self.axis),
 
     def backward(self, xs, gy):
         if len(xs) == 1:
@@ -56,7 +58,7 @@ class Concat(function.Function):
         return xp.split(gy[0], sizes, axis=self.axis)
 
 
-def concat(xs, axis=1):
+def concat(xs, axis=1, equal=False):
     """Concatenates given variables along an axis.
 
     Args:
@@ -67,4 +69,4 @@ def concat(xs, axis=1):
         ~chainer.Variable: Output variable.
 
     """
-    return Concat(axis=axis)(*xs)
+    return Concat(axis=axis, equal=equal)(*xs)
