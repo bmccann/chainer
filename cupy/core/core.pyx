@@ -1438,6 +1438,7 @@ cpdef vector.vector[Py_ssize_t] _get_strides_for_nocopy_reshape(
 include "carray.pxi"
 include "elementwise.pxi"
 include "reduction.pxi"
+include "raw.pxi"
 
 
 # =============================================================================
