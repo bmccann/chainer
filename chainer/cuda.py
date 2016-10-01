@@ -537,6 +537,24 @@ def reduce(in_params, out_params, map_expr, reduce_expr, post_map_expr,
         identity, name, **kwargs)
 
 
+@memoize(for_each_device=True)
+def raw(operation, name, **kwargs):
+    """Creates a global raw kernel function.
+
+    This function uses :func:`~chainer.cuda.memoize` to cache the resulting
+    kernel object, i.e. the resulting kernel object is cached for each argument
+    combination and CUDA device.
+
+    The arguments are the same as those for
+    :class:`cupy.RawKernel`, except that the ``name`` argument is
+    mandatory.
+
+    """
+    check_cuda_available()
+    return cupy.RawKernel(
+        operation, name, **kwargs)
+
+
 # ------------------------------------------------------------------------------
 # numpy/cupy compatible coding
 # ------------------------------------------------------------------------------

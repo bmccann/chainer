@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from cupy.core import core  # NOQA
 from cupy.core import internal  # NOQA
 
@@ -38,6 +39,7 @@ from cupy.core.core import ndarray  # NOQA
 from cupy.core.core import negative  # NOQA
 from cupy.core.core import not_equal  # NOQA
 from cupy.core.core import power  # NOQA
+from cupy.core.core import RawKernel  # NOQA
 from cupy.core.core import ReductionKernel  # NOQA
 from cupy.core.core import remainder  # NOQA
 from cupy.core.core import right_shift  # NOQA
