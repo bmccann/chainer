@@ -184,7 +184,7 @@ class NStepLSTM(function.Function):
         (hx, cx), inputs = _split(inputs, 2)
         ws, inputs = _split(inputs, self.n_layers * 8)
         bs, inputs = _split(inputs, self.n_layers * 8)
-        x_list = inputs
+        x_list = [cuda.cupy.ascontiguousarray(xi) for xi in inputs]
 
         hx = cuda.cupy.ascontiguousarray(hx)
         cx = cuda.cupy.ascontiguousarray(cx)
@@ -275,7 +275,7 @@ class NStepLSTM(function.Function):
         (hx, cx), inputs = _split(inputs, 2)
         ws, inputs = _split(inputs, self.n_layers * 8)
         bs, inputs = _split(inputs, self.n_layers * 8)
-        x_list = inputs
+        x_list = [cuda.cupy.ascontiguousarray(xi) for xi in inputs]
 
         hx = cuda.cupy.ascontiguousarray(hx)
         cx = cuda.cupy.ascontiguousarray(cx)
@@ -289,6 +289,8 @@ class NStepLSTM(function.Function):
         for i in six.moves.range(len(dy_list)):
             if dy_list[i] is None:
                 dy_list[i] = cuda.cupy.zeros_like(x_list[i])
+            else:
+                dy_list[i] = cuda.cupy.ascontiguousarray(dy_list[i])
 
         xs = cuda.cupy.concatenate(x_list, axis=0)
         length = len(x_list)
@@ -384,9 +386,9 @@ def n_step_lstm(
        i_t = \sigma(W_0 x_t + W_4 h_{t-1} + b_0 + b_4)
        f_t = \sigma(W_1 x_t + W_5 h_{t-1} + b_1 + b_5)
        o_t = \sigma(W_2 x_t + W_6 h_{t-1} + b_2 + b_6)
-       a_t = \tanh(W_3 x_t + W_7 h_{t-1} + b_3 + b_7)
+       a_t = \\tanh(W_3 x_t + W_7 h_{t-1} + b_3 + b_7)
        c_t = f_t \dot c_{t-1} + i_t \dot a_t
-       h_t = o_t \dot \tanh(c_t)
+       h_t = o_t \dot \\tanh(c_t)
 
     As the function accepts a sequence, it calculates :math:`h_t` for all
     :math:`t` with one call. Eight weight matrices and eight bias vectors are
