@@ -190,6 +190,9 @@ Actual: {0}'''.format(type(data))
     def grad(self, g):
         if g is not None:
             _check_grad_type(None, self, g)
+        else:
+            if self.creator is None:
+                print(1/0)
         self._grad = g
 
     @property
@@ -229,6 +232,10 @@ Actual: {0}'''.format(type(data))
 
     def cleargrad(self):
         """Clears the gradient array."""
+        if self._grad is None:
+            return
+        if self._grad.parent is not None:
+            raise RuntimeError('Cannot use cleargrads with multiprocess parallelism.')
         self._grad = None
 
     def zerograd(self):
