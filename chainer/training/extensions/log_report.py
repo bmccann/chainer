@@ -91,8 +91,7 @@ class LogReport(extension.Extension):
                 stats_cpu[name] = float(value)  # copy to CPU
 
             updater = trainer.updater
-            stats_cpu['epoch'] = updater.epoch
-            stats_cpu['epoch_detail'] = updater.epoch_detail
+            stats_cpu['epoch'] = updater.epoch_detail
             stats_cpu['iteration'] = updater.iteration
             stats_cpu['elapsed_time'] = trainer.elapsed_time
 

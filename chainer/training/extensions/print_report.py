@@ -23,31 +23,18 @@ class PrintReport(extension.Extension):
 
     """
 
-    def __init__(self, entries, log_report='LogReport', out=sys.stdout):
+    def __init__(self, entries=None, log_report='LogReport', out=sys.stdout):
         self._entries = entries
         self._log_report = log_report
         self._out = out
 
         self._log_len = 0  # number of observations already printed
 
-        # format information
-        entry_widths = [max(10, len(s)) for s in entries]
-
-        header = '  '.join(('{:%d}' % w for w in entry_widths)).format(
-            *entries) + '\n'
-        self._header = header  # printed at the first call
-
-        templates = []
-        for entry, w in zip(entries, entry_widths):
-            templates.append((entry, '{:<%dg}  ' % w, ' ' * (w + 2)))
-        self._templates = templates
-
     def __call__(self, trainer):
         out = self._out
 
-        if self._header:
-            out.write(self._header)
-            self._header = None
+        # delete the printed contents from the current cursor
+        out.write('\033[J')
 
         log_report = self._log_report
         if isinstance(log_report, str):
@@ -60,6 +47,29 @@ class PrintReport(extension.Extension):
 
         log = log_report.log
         log_len = self._log_len
+
+        if log_len == 0:
+
+            if self._entries is None:
+                def key(heading):
+                    if heading[:4] == 'dev/':
+                        return heading[4:] + '*'
+                    return heading
+                entries = sorted(list(log[0].keys()), key=key)
+            else:
+                entries = self._entries
+
+            # format information
+            entry_widths = [max(10, len(s)) for s in entries]
+
+            out.write('  '.join(('{:%d}' % w for w in entry_widths)).format(
+                *entries) + '\n')
+
+            templates = []
+            for entry, w in zip(entries, entry_widths):
+                templates.append((entry, '{:<%dg}  ' % w, ' ' * (w + 2)))
+            self._templates = templates
+
         while len(log) > log_len:
             # delete the printed contents from the current cursor
             if os.name == 'nt':
