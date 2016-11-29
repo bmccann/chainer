@@ -255,7 +255,7 @@ class Summary(object):
             self._x2 += value * value
             self._n += 1
 
-    def compute_mean(self):
+    def summarize(self):
         """Computes the mean."""
         x, n = self._x, self._n
         with _get_device(x):
@@ -306,7 +306,7 @@ class DictSummary(object):
             if numpy.isscalar(v) or getattr(v, 'ndim', -1) == 0:
                 summaries[k].add(v)
 
-    def compute_mean(self):
+    def summarize(self):
         """Creates a dictionary of mean values.
 
         It returns a single dictionary that holds a mean value for each entry
@@ -316,7 +316,7 @@ class DictSummary(object):
             dict: Dictionary of mean values.
 
         """
-        return {name: summary.compute_mean()
+        return {name: summary.summarize()
                 for name, summary in six.iteritems(self._summaries)}
 
     def make_statistics(self):
@@ -338,3 +338,19 @@ class DictSummary(object):
             stats[name + '.std'] = std
 
         return stats
+
+
+class ConcatSummary(object):
+
+    def __init__(self):
+
+        self._summaries = collections.defaultdict(lambda: [])
+
+    def add(self, d):
+        for k, v in six.iteritems(d):
+            if isinstance(v, variable.Variable):
+                v = v.data
+            self._summaries[k].append(v)
+
+    def summarize(self):
+        return self._summaries

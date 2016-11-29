@@ -55,12 +55,15 @@ class LogReport(extension.Extension):
     """
 
     def __init__(self, keys=None, trigger=(1, 'epoch'), postprocess=None,
+                 compute_summary=None, summary=reporter.SumSummary,
                  log_name='log'):
         self._keys = keys
         self._trigger = trigger_module.get_trigger(trigger)
         self._postprocess = postprocess
+        self._compute_summary = compute_summary
         self._log_name = log_name
         self._log = []
+        self._summary_cls = summary
 
         self._init_summary()
 
@@ -77,7 +80,12 @@ class LogReport(extension.Extension):
 
         if self._trigger(trainer):
             # output the result
-            stats = self._summary.compute_mean()
+            stats = self._summary.summarize()
+            if self._compute_summary is None:
+                stats = {k: sum(stats[k]) / len(stats[k]) for k in stats}
+            else:
+                stats = self._compute_summary(stats)
+
             stats_cpu = {}
             for name, value in six.iteritems(stats):
                 stats_cpu[name] = float(value)  # copy to CPU
@@ -121,4 +129,4 @@ class LogReport(extension.Extension):
             self._log = json.loads(log)
 
     def _init_summary(self):
-        self._summary = reporter.DictSummary()
+        self._summary = self._summary_cls()

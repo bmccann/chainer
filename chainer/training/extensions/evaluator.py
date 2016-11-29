@@ -70,7 +70,8 @@ class Evaluator(extension.Extension):
     priority = extension.PRIORITY_WRITER
 
     def __init__(self, iterator, target, converter=convert.concat_examples,
-                 device=None, eval_hook=None, eval_func=None):
+                 device=None, eval_hook=None, eval_func=None,
+                 compute_summary=None):
         if isinstance(iterator, iterator_module.Iterator):
             iterator = {'main': iterator}
         self._iterators = iterator
@@ -83,6 +84,7 @@ class Evaluator(extension.Extension):
         self.device = device
         self.eval_hook = eval_hook
         self.eval_func = eval_func
+        self.compute_summary = compute_summary
 
     def get_iterator(self, name):
         """Returns the iterator of the given name."""
