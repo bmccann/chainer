@@ -69,7 +69,7 @@ class PrintReport(extension.Extension):
             for entry, w in zip(entries, entry_widths):
                 templates.append((entry, '{:<%dg}  ' % w, ' ' * (w + 2)))
             self._templates = templates
-
+        
         while len(log) > log_len:
             # delete the printed contents from the current cursor
             if os.name == 'nt':

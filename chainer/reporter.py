@@ -304,7 +304,7 @@ class DictSummary(object):
             if isinstance(v, variable.Variable):
                 v = v.data
             if numpy.isscalar(v) or getattr(v, 'ndim', -1) == 0:
-                summaries[k].add(v)
+                summaries[k].add(float(v))
 
     def summarize(self):
         """Creates a dictionary of mean values.
@@ -350,6 +350,8 @@ class ConcatSummary(object):
         for k, v in six.iteritems(d):
             if isinstance(v, variable.Variable):
                 v = v.data
+            if numpy.isscalar(v) or getattr(v, 'ndim', -1) == 0:
+                v = float(v)
             self._summaries[k].append(v)
 
     def summarize(self):

@@ -91,7 +91,7 @@ def main():
     # either the updater or the evaluator.
     trainer.extend(extensions.PrintReport(
         ['epoch', 'main/loss', 'validation/main/loss',
-         'main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
+         'main/accuracy', 'validation/main/accuracy', 'elapsed_time']), (1, 'epoch'))
 
     # Print a progress bar to stdout
     trainer.extend(extensions.ProgressBar())

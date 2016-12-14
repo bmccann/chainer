@@ -55,7 +55,7 @@ class LogReport(extension.Extension):
     """
 
     def __init__(self, keys=None, trigger=(1, 'epoch'), postprocess=None,
-                 compute_summary=None, summary=reporter.SumSummary,
+                 compute_summary=None, summary=reporter.ConcatSummary,
                  log_name='log'):
         self._keys = keys
         self._trigger = trigger_module.get_trigger(trigger)
@@ -77,7 +77,7 @@ class LogReport(extension.Extension):
             summary.add(observation)
         else:
             summary.add({k: observation[k] for k in keys if k in observation})
-
+        
         if self._trigger(trainer):
             # output the result
             stats = self._summary.summarize()
