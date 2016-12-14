@@ -411,13 +411,8 @@ class MultiprocessParallelUpdater(StandardUpdater):
     parallelizes the gradient computation over a mini-batch, and updates the
     parameters only in the main device.
 
-<<<<<<< HEAD
     Unlike other built-in Updater classes, the model (attached to the
     optimizer) must be the loss function.
-=======
-    Unlike other built-in Updater classes, the model (attached to the optimizer)
-    must be the loss function.
->>>>>>> multiprocess parallel updater
 
     Args:
         iterator: Dataset iterator for the training dataset.
@@ -462,16 +457,10 @@ class MultiprocessParallelUpdater(StandardUpdater):
         self._devices = devices
         self._depth = math.ceil(math.log(len(devices)) / math.log(2))
 
-<<<<<<< HEAD
         self._ipc_setup = False
         self.setup_workers()
 
     def setup_workers(self):
-=======
-        self._started = False
-
-    def start(self):
->>>>>>> multiprocess parallel updater
 
         devices = self._devices[1:]
         self._pipes, self._workers, worker_ends = [], [], []
@@ -484,12 +473,9 @@ class MultiprocessParallelUpdater(StandardUpdater):
             self._workers.append(worker)
 
         self._master.to_gpu(self._devices[0])
-<<<<<<< HEAD
 
     def setup_ipc(self):
 
-=======
->>>>>>> multiprocess parallel updater
         ipc_parameters = [list(self._master.get_handles())]
         for i, pipe in enumerate(self._pipes):
             pipe.send(ipc_parameters[self._parent(i + 1)])
@@ -497,11 +483,7 @@ class MultiprocessParallelUpdater(StandardUpdater):
 
         time.sleep(0.1)
 
-<<<<<<< HEAD
         self._ipc_setup = True
-=======
-        self._started = True
->>>>>>> multiprocess parallel updater
 
     @staticmethod
     def _parent(index):
@@ -521,11 +503,7 @@ class MultiprocessParallelUpdater(StandardUpdater):
         master_batch = self.converter(batch[0::n], master_device)
         device_batches = [batch[i::n] for i in range(1, n)]
 
-<<<<<<< HEAD
         if self._ipc_setup:
-=======
-        if self._started:
->>>>>>> multiprocess parallel updater
             for pipe, batch in zip(self._pipes, device_batches):
                 pipe.send(('train', batch))
 
@@ -541,7 +519,6 @@ class MultiprocessParallelUpdater(StandardUpdater):
             loss = self._master(in_vars)
 
         self._master.zerograds()
-<<<<<<< HEAD
         loss.backward()
 
         if not self._ipc_setup:
@@ -549,17 +526,6 @@ class MultiprocessParallelUpdater(StandardUpdater):
             for pipe, batch in zip(self._pipes, device_batches):
                 pipe.send(('train', batch))
 
-=======
-        # print(loss.data.tolist())
-        loss.backward()
-
-        if not self._started:
-            self.start()
-            for pipe, batch in zip(self._pipes, device_batches):
-                pipe.send(('train', batch))
-
-        #[pipe.recv() for pipe in self._pipes]
->>>>>>> multiprocess parallel updater
         [reporter.report(pipe.recv()) for pipe in self._pipes]
 
         for depth in range(self._depth):
