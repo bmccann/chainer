@@ -16,6 +16,8 @@ cimport cython
 
 from cupy.cuda cimport driver
 
+cdef int _current_device = -1
+
 cdef class PointerAttributes:
 
     def __init__(self, int device, size_t devicePointer, size_t hostPointer,
@@ -170,9 +172,12 @@ cpdef int runtimeGetVersion() except *:
 
 cpdef int getDevice() except *:
     cdef int device
-    status = cudaGetDevice(&device)
-    check_status(status)
-    return device
+    global _current_device
+    if _current_device == -1:
+        status = cudaGetDevice(&device)
+        check_status(status)
+        _current_device = device
+    return _current_device
 
 
 cpdef int deviceGetAttribute(int attrib, int device) except *:
@@ -190,8 +195,10 @@ cpdef int getDeviceCount() except *:
 
 
 cpdef setDevice(int device):
-    status = cudaSetDevice(device)
-    check_status(status)
+    global _current_device
+    if device != _current_device:
+        status = cudaSetDevice(device)
+        check_status(status)
 
 
 cpdef deviceSynchronize():
