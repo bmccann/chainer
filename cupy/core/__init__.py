@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from cupy.core import core  # NOQA
 from cupy.core import internal  # NOQA
 
